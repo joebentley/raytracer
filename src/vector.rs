@@ -31,6 +31,10 @@ impl Vector {
         self.normalise();
         return self;
     }
+
+    pub fn dot(&self, other: &Self) -> f64 {
+        return self.x * other.x + self.y * other.y + self.z * other.z;
+    }
 }
 
 impl Add for Vector {
@@ -128,6 +132,7 @@ mod tests {
         let a = Vector::new(1., 2., 3.);
         assert_eq!(a.abs(), 14.);
         assert_eq!(a.length(), (14.0 as f64).sqrt());
+        assert_eq!(a.abs(), a.dot(&a));
     }
 
     #[test]
@@ -151,5 +156,12 @@ mod tests {
         assert_eq!(a.y, 4.);
         a *= 2;
         assert_eq!(a.y, 8.);
+    }
+
+    #[test]
+    fn vector_dot() {
+        let a = Vector::new(1., 2., 3.);
+        let b = Vector::new(2., 3., 4.);
+        assert_eq!(a.dot(&b), 20.);
     }
 }
