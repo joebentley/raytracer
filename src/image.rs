@@ -1,5 +1,5 @@
 pub struct Image {
-    pixel_data: Vec<u8>, // RGB24
+    pixel_data: Vec<u8>, // BGR888
     width: u16,
     height: u16,
 }
@@ -12,10 +12,21 @@ impl Image {
             height,
         }
     }
+
+    pub fn fill_with(&mut self, r: u8, g: u8, b: u8) -> &mut Self {
+        for y in 0..self.height as usize {
+            for x in 0..self.width as usize {
+                self.pixel_data[3 * x + 3 * self.width as usize * y] = b;
+                self.pixel_data[1 + 3 * x + 3 * self.width as usize * y] = g;
+                self.pixel_data[2 + 3 * x + 3 * self.width as usize * y] = r;
+            }
+        }
+        return self;
+    }
 }
 
 fn blank_pixel_data(width: u16, height: u16) -> Vec<u8> {
-    let mut v = vec![];
+    let mut v = Vec::with_capacity(width as usize * height as usize * 3);
     for _ in 0..height {
         for _ in 0..width {
             v.push(255);
@@ -114,12 +125,12 @@ impl From<Image> for BMPImage {
             for x in 0..image.width {
                 let x_i: usize = x as usize * 3;
                 let y: usize = y.into();
-                let r =
-                    image.pixel_data[x_i + (image.height as usize - 1 - y) * image.width as usize];
+                let r = image.pixel_data
+                    [x_i + 3 * (image.height as usize - 1 - y) * image.width as usize];
                 let g = image.pixel_data
-                    [x_i + (image.height as usize - 1 - y) * image.width as usize + 1];
+                    [x_i + 3 * (image.height as usize - 1 - y) * image.width as usize + 1];
                 let b = image.pixel_data
-                    [x_i + (image.height as usize - 1 - y) * image.width as usize + 2];
+                    [x_i + 3 * (image.height as usize - 1 - y) * image.width as usize + 2];
 
                 pixel_array[x_i + y * row_size as usize] = r;
                 pixel_array[x_i + y * row_size as usize + 1] = g;
