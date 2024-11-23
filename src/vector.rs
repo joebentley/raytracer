@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector {
@@ -69,6 +69,38 @@ impl SubAssign for Vector {
     }
 }
 
+impl Mul<f64> for Vector {
+    type Output = Self;
+    fn mul(mut self, rhs: f64) -> Self {
+        self *= rhs;
+        return self;
+    }
+}
+
+impl MulAssign<f64> for Vector {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
+    }
+}
+
+impl Mul<i32> for Vector {
+    type Output = Self;
+    fn mul(mut self, rhs: i32) -> Self {
+        self *= rhs;
+        return self;
+    }
+}
+
+impl MulAssign<i32> for Vector {
+    fn mul_assign(&mut self, rhs: i32) {
+        self.x *= rhs as f64;
+        self.y *= rhs as f64;
+        self.z *= rhs as f64;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,5 +138,18 @@ mod tests {
         assert_eq!(a_normalised.x, 1. / length);
         a.normalise();
         assert_eq!(a.y, 2. / length);
+    }
+
+    #[test]
+    fn vector_scalar_mul() {
+        let mut a = Vector::new(1., 2., 3.);
+        let b = a * 4.;
+        assert_eq!(b.y, 8.);
+        let c = a * 4;
+        assert_eq!(c.y, 8.);
+        a *= 2.;
+        assert_eq!(a.y, 4.);
+        a *= 2;
+        assert_eq!(a.y, 8.);
     }
 }
