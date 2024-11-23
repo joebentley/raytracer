@@ -12,12 +12,20 @@ impl Vector {
         Self { x, y, z }
     }
 
-    pub fn abs(&self) -> f64 {
+    pub fn zero() -> Self {
+        Self {
+            x: 0.,
+            y: 0.,
+            z: 0.,
+        }
+    }
+
+    pub fn abs_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn length(&self) -> f64 {
-        self.abs().sqrt()
+        self.abs_squared().sqrt()
     }
 
     pub fn normalise(&mut self) {
@@ -128,11 +136,11 @@ mod tests {
     }
 
     #[test]
-    fn vector_abs_and_length() {
+    fn vector_abs_squared_and_length() {
         let a = Vector::new(1., 2., 3.);
-        assert_eq!(a.abs(), 14.);
+        assert_eq!(a.abs_squared(), 14.);
         assert_eq!(a.length(), (14.0 as f64).sqrt());
-        assert_eq!(a.abs(), a.dot(&a));
+        assert_eq!(a.abs_squared(), a.dot(&a));
     }
 
     #[test]

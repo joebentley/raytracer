@@ -1,6 +1,8 @@
 mod colour;
 mod image;
+mod raytrace;
 mod vector;
+mod world;
 
 use std::{fs::File, io::Write};
 
