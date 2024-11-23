@@ -1,7 +1,7 @@
 pub struct Image {
     pixel_data: Vec<u8>, // BGR888
-    width: u16,
-    height: u16,
+    pub width: u16,
+    pub height: u16,
 }
 
 impl Image {
@@ -21,6 +21,14 @@ impl Image {
                 self.pixel_data[2 + 3 * x + 3 * self.width as usize * y] = r;
             }
         }
+        return self;
+    }
+
+    pub fn put_pixel(&mut self, x: usize, y: usize, value_rgb24: u32) -> &mut Self {
+        let bytes = u32_to_bytes_little_endian(value_rgb24);
+        self.pixel_data[3 * x + 3 * self.width as usize * y] = bytes[0]; // b
+        self.pixel_data[1 + 3 * x + 3 * self.width as usize * y] = bytes[1]; // g
+        self.pixel_data[2 + 3 * x + 3 * self.width as usize * y] = bytes[2]; // r
         return self;
     }
 }
@@ -198,14 +206,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_u16_to_bytes() {
+    fn u16_to_bytes_is_little_endian() {
         let array = u16_to_bytes_little_endian(0x1234);
         assert_eq!(array[0], 0x34);
         assert_eq!(array[1], 0x12);
     }
 
     #[test]
-    fn test_u32_to_bytes() {
+    fn u32_to_bytes_is_little_endian() {
         let array = u32_to_bytes_little_endian(0x12345678);
         assert_eq!(array[0], 0x78);
         assert_eq!(array[1], 0x56);
