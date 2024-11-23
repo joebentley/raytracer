@@ -1,5 +1,6 @@
 mod colour;
 mod image;
+mod vector;
 
 use std::{fs::File, io::Write};
 
