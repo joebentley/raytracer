@@ -171,7 +171,6 @@ impl World {
             result.position = position;
             result.normal = closest_entity.normal(ray);
             result.material = closest_entity.material();
-            // dbg!("hit @ {:?} x {:?}", position, result.normal);
         }
 
         return result;

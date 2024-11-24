@@ -24,10 +24,10 @@ pub fn trace_path_no_recurse(world: &World, ray: Vector) -> Option<Colour> {
     let hit_to_light = (light.position - result.position).normalised();
     let cos_angle = hit_to_light.dot(&result.normal) as f32;
 
-    Some(material.colour * cos_angle)
+    Some(material.colour * cos_angle * light.intensity as f32)
 }
 
-pub fn render(world: &World, width: u16, height: u16) -> Image {
+pub fn render(world: &World, background: Colour, width: u16, height: u16) -> Image {
     let mut image = Image::new(width, height);
 
     let theta_fov = 90. * f64::consts::PI / 180.;
@@ -47,7 +47,7 @@ pub fn render(world: &World, width: u16, height: u16) -> Image {
                 d,
             );
 
-            let mut c = Colour::black();
+            let mut c = background;
             if let Some(colour) = trace_path_no_recurse(world, ray) {
                 c = colour;
             }
