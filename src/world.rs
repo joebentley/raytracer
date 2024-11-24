@@ -68,11 +68,21 @@ impl Entity for Sphere {
             return IntersectionResult::No;
         } else if delta.abs() < INTERSECTION_EPSILON {
             let t = -b / (2. * a);
-            return IntersectionResult::One(t);
+            // Sphere is behind camera
+            if t > 0. {
+                return IntersectionResult::One(t);
+            } else {
+                return IntersectionResult::No;
+            }
         } else {
             let t1 = (-b + delta.sqrt()) / (2. * a);
             let t2 = (-b - delta.sqrt()) / (2. * a);
-            return IntersectionResult::Two(t1, t2);
+            // We're inside the sphere
+            if t1 > 0. {
+                return IntersectionResult::Two(t1, t2);
+            } else {
+                return IntersectionResult::No;
+            }
         }
     }
 
@@ -157,9 +167,11 @@ impl World {
 
         if hit {
             let position = ray * dist;
+            result.hit = true;
             result.position = position;
-            result.normal = closest_entity.normal(position);
+            result.normal = closest_entity.normal(ray);
             result.material = closest_entity.material();
+            // dbg!("hit @ {:?} x {:?}", position, result.normal);
         }
 
         return result;

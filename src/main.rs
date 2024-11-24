@@ -7,15 +7,15 @@ mod world;
 use std::{fs::File, io::Write};
 
 use colour::Colour;
-use image::{BMPImage, Image};
+use image::BMPImage;
 use vector::Vector;
 use world::{Sphere, World};
 
 fn main() {
     let mut world = World::new();
     let sphere = Box::new(Sphere::new(
-        Vector::new(0., 0., 1.),
-        1.,
+        Vector::new(0., 0., 4.),
+        2.,
         Colour::new(1., 0., 0.),
     ));
     world.entities.push(sphere);

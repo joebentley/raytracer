@@ -40,13 +40,14 @@ pub fn render(world: &World, width: u16, height: u16) -> Image {
         for x in 0..width {
             let p_x = x as f64 + 0.5;
 
+            // Ray from camera
             let ray = Vector::new(
                 aspect_ratio * 2. * p_x / width as f64 - 1.,
                 2. * p_y / height as f64 - 1.,
                 d,
             );
 
-            let mut c = Colour::white();
+            let mut c = Colour::black();
             if let Some(colour) = trace_path_no_recurse(world, ray) {
                 c = colour;
             }
