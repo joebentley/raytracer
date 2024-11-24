@@ -3,8 +3,8 @@ use crate::vector::Vector;
 const INTERSECTION_EPSILON: f64 = 1e-4;
 pub enum IntersectionResult {
     No,
-    One(Vector),
-    Two(Vector, Vector),
+    One(f64),
+    Two(f64, f64),
 }
 
 trait Entity {
@@ -39,11 +39,11 @@ impl Entity for Sphere {
             return IntersectionResult::No;
         } else if delta.abs() < INTERSECTION_EPSILON {
             let t = -b / (2. * a);
-            return IntersectionResult::One(normalised_ray * t);
+            return IntersectionResult::One(t);
         } else {
             let t1 = (-b + delta.sqrt()) / (2. * a);
             let t2 = (-b - delta.sqrt()) / (2. * a);
-            return IntersectionResult::Two(normalised_ray * t1, normalised_ray * t2);
+            return IntersectionResult::Two(t1, t2);
         }
     }
 }
