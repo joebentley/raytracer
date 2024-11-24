@@ -24,7 +24,9 @@ impl Image {
         return self;
     }
 
-    pub fn put_pixel(&mut self, x: usize, y: usize, value_rgb24: u32) -> &mut Self {
+    pub fn put_pixel(&mut self, x: u16, y: u16, value_rgb24: u32) -> &mut Self {
+        let x = x as usize;
+        let y = y as usize;
         let bytes = u32_to_bytes_little_endian(value_rgb24);
         self.pixel_data[3 * x + 3 * self.width as usize * y] = bytes[0]; // b
         self.pixel_data[1 + 3 * x + 3 * self.width as usize * y] = bytes[1]; // g

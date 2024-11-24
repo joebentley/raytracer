@@ -8,17 +8,19 @@ use std::{fs::File, io::Write};
 
 use colour::Colour;
 use image::{BMPImage, Image};
+use vector::Vector;
+use world::{Sphere, World};
 
 fn main() {
-    let mut image = Image::new(400, 400);
+    let mut world = World::new();
+    let sphere = Box::new(Sphere::new(
+        Vector::new(0., 0., 1.),
+        1.,
+        Colour::new(1., 0., 0.),
+    ));
+    world.entities.push(sphere);
 
-    for y in 0..image.height as usize {
-        let g = y as f32 / image.height as f32;
-        for x in 0..image.width as usize {
-            let r = x as f32 / image.width as f32;
-            image.put_pixel(x, y, Colour::new(r, g, 0.).as_rgb24());
-        }
-    }
+    let image = raytrace::render(&world, 400, 400);
 
     let bmpimage = BMPImage::from(image);
 
