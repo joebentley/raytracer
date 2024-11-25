@@ -38,7 +38,13 @@ fn main() {
         2.,
         Colour::new(1., 0., 0.),
     ));
+    let sphere2 = Box::new(Sphere::new(
+        Vector::new(1., 0.5, 3.),
+        1.5,
+        Colour::new(1., 0., 1.),
+    ));
     world.entities.push(sphere);
+    world.entities.push(sphere2);
 
     let image = raytrace::render(&world, Colour::white(), 400, 400);
 

@@ -1,7 +1,8 @@
 use crate::colour::Colour;
 use crate::vector::Vector;
+use serde::Deserialize;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub struct Material {
     pub colour: Colour,
 }
@@ -28,7 +29,7 @@ pub trait Entity {
     fn normal(&self, position: Vector) -> Vector;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub struct Sphere {
     position: Vector,
     radius: f64,
@@ -134,6 +135,27 @@ impl World {
         }
     }
 
+    pub fn from_toml(table: &toml::Table) -> Self {
+        let mut world = Self::new();
+
+        if let Some(toml::Value::Array(array)) = table.get("entities") {
+            for entity in array {
+                if let Some(toml::Value::String(s)) = entity.get("type") {
+                    match s.to_lowercase().as_str() {
+                        "sphere" => {
+                            if let Ok(sphere) = toml::Value::try_into::<Sphere>(entity.clone()) {
+                                world.entities.push(Box::new(sphere));
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        return world;
+    }
+
     pub fn find_nearest(&self, ray: Vector) -> RaycastResult {
         let mut dist = f64::INFINITY;
         let mut closest_entity: &Box<dyn Entity> = &self.entities[0];
@@ -174,5 +196,45 @@ impl World {
         }
 
         return result;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_toml_deserialize() {
+        let toml_string = r#"
+        [[entities]]
+        type = "sphere"
+        position = {x = 0, y = 0, z = 0}
+        radius = 5
+        material = {colour = {r = 1, g = 0, b = 1}}
+        
+        # should fail
+        [[entities]]
+        position = {x = 2, y = 0, z = 5}
+        radius = 2
+        material = {colour = {r = 0, g = 0, b = 1}}
+
+        [[entities]]
+        type = "sphere"
+        position = {x = 2, y = 0, z = 5}
+        radius = 2
+        material = {colour = {r = 0, g = 0, b = 1}}
+
+        # should fail
+        [[entities]]
+        type = "sphere"
+        position = {x = 2, y = 0, z = 5}
+        material = {colour = {r = 0, g = 0, b = 1}}
+        "#;
+
+        let table = toml_string.parse::<toml::Table>().unwrap();
+        let world = World::from_toml(&table);
+
+        assert_eq!(world.entities.len(), 2);
+        assert!(false);
     }
 }
