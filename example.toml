@@ -11,6 +11,6 @@ material = { colour = [1, 1, 0] }
 
 [[entities]]
 type = "sphere"
-position = [1, 0.5, 3]
+position = { x = 1, y = 0.5, z = 3 }            # struct form
 radius = 1.5
-material = { colour = [1, 0, 1] }
+material = { colour = { r = 1, g = 0, b = 1 } } # struct form
