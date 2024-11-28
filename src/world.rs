@@ -26,6 +26,7 @@ pub enum IntersectionResult {
 pub trait Entity {
     fn intersection(&self, ray: Vector) -> IntersectionResult;
     fn material(&self) -> Material;
+    fn position(&self) -> Vector;
     fn normal(&self, position: Vector) -> Vector;
 }
 
@@ -89,6 +90,10 @@ impl Entity for Sphere {
 
     fn material(&self) -> Material {
         self.material
+    }
+
+    fn position(&self) -> Vector {
+        self.position
     }
 
     fn normal(&self, at: Vector) -> Vector {
@@ -228,7 +233,8 @@ mod tests {
 
         [[entities]]
         type = "sphere"
-        position = {x = 0, y = 0, z = 0}
+        # testing seq deserialize for Vector
+        position = [0, 0, 1]
         radius = 5
         material = {colour = {r = 1, g = 0, b = 1}}
         
@@ -242,7 +248,7 @@ mod tests {
         type = "sphere"
         position = {x = 2, y = 0, z = 5}
         radius = 2
-        material = {colour = {r = 0, g = 0, b = 1}}
+        material = {colour = [0, 0, 1]}
 
         # should fail
         [[entities]]
@@ -256,5 +262,6 @@ mod tests {
 
         assert_eq!(world.light.intensity, 0.8);
         assert_eq!(world.entities.len(), 2);
+        assert_eq!(world.entities[0].position(), Vector::new(0., 0., 1.))
     }
 }

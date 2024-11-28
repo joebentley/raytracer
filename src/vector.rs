@@ -1,11 +1,94 @@
-use serde::Deserialize;
+use serde::{
+    de::{self, Visitor},
+    Deserialize,
+};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector {
     x: f64,
     y: f64,
     z: f64,
+}
+
+// From here: https://serde.rs/deserialize-struct.html
+impl<'de> Deserialize<'de> for Vector {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(field_identifier, rename_all = "lowercase")]
+        enum Field {
+            X,
+            Y,
+            Z,
+        }
+
+        struct VectorVisitor;
+
+        impl<'de> Visitor<'de> for VectorVisitor {
+            type Value = Vector;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("struct Vector")
+            }
+
+            fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::SeqAccess<'de>,
+            {
+                let x = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
+                let y = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                let z = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(2, &self))?;
+                Ok(Vector::new(x, y, z))
+            }
+
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: de::MapAccess<'de>,
+            {
+                let mut x = None;
+                let mut y = None;
+                let mut z = None;
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::X => {
+                            if x.is_some() {
+                                return Err(de::Error::duplicate_field("x"));
+                            }
+                            x = Some(map.next_value()?);
+                        }
+                        Field::Y => {
+                            if y.is_some() {
+                                return Err(de::Error::duplicate_field("y"));
+                            }
+                            y = Some(map.next_value()?);
+                        }
+                        Field::Z => {
+                            if z.is_some() {
+                                return Err(de::Error::duplicate_field("z"));
+                            }
+                            z = Some(map.next_value()?);
+                        }
+                    }
+                }
+                let x = x.ok_or_else(|| de::Error::missing_field("x"))?;
+                let y = y.ok_or_else(|| de::Error::missing_field("y"))?;
+                let z = z.ok_or_else(|| de::Error::missing_field("z"))?;
+                Ok(Vector::new(x, y, z))
+            }
+        }
+
+        const FIELDS: &[&str] = &["x", "y", "z"];
+        deserializer.deserialize_struct("Vector", FIELDS, VectorVisitor)
+    }
 }
 
 impl Vector {

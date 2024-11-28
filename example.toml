@@ -1,16 +1,16 @@
 
 [light]
-position = {x = -1, y = 4, z = -1}
+position = [-1, 4, -1]
 intensity = 1.1
 
 [[entities]]
 type = "sphere"
-position = {x = 0, y = 0, z = 4}
+position = [0, 0, 4]
 radius = 2
-material = {colour = {r = 1, g = 0, b = 0}}
+material = { colour = [1, 1, 0] }
 
 [[entities]]
 type = "sphere"
-position = {x = 1, y = 0.5, z = 3}
+position = [1, 0.5, 3]
 radius = 1.5
-material = {colour = {r = 1, g = 0, b = 1}}
+material = { colour = [1, 0, 1] }
