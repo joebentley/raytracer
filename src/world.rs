@@ -130,6 +130,7 @@ impl Light {
 pub struct World {
     pub entities: Vec<Box<dyn Entity>>,
     pub light: Light,
+    pub background: Colour,
 }
 
 impl World {
@@ -137,11 +138,20 @@ impl World {
         Self {
             entities: Vec::new(),
             light: Light::default(),
+            background: Colour::white(),
         }
     }
 
     pub fn from_toml(table: &toml::Table) -> Self {
         let mut world = Self::new();
+
+        if let Some(value) = table.get("background") {
+            if let Ok(colour) = toml::Value::try_into::<Colour>(value.clone()) {
+                world.background = colour;
+            } else {
+                eprintln!("Warning: failed to parse background colour. Using white.");
+            }
+        }
 
         if let Some(value) = table.get("light") {
             if let Ok(light) = toml::Value::try_into::<Light>(value.clone()) {
@@ -227,6 +237,8 @@ mod tests {
     #[test]
     fn test_toml_deserialize() {
         let toml_string = r#"
+        background = [1, 0, 0]
+
         [light]
         position = {x = 1, y = 0, z = 0}
         intensity = 0.8
@@ -260,6 +272,7 @@ mod tests {
         let table = toml_string.parse::<toml::Table>().unwrap();
         let world = World::from_toml(&table);
 
+        assert_eq!(world.background, Colour::new(1., 0., 0.));
         assert_eq!(world.light.intensity, 0.8);
         assert_eq!(world.entities.len(), 2);
         assert_eq!(world.entities[0].position(), Vector::new(0., 0., 1.))

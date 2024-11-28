@@ -9,7 +9,6 @@ use std::error::Error;
 use std::io::Read;
 use std::{fs::File, io::Write};
 
-use colour::Colour;
 use image::BMPImage;
 use world::World;
 
@@ -43,7 +42,7 @@ fn main() {
 
     match open_and_parse_toml(world_spec_filename.unwrap().as_str()) {
         Ok(world) => {
-            let image = raytrace::render(&world, Colour::white(), 400, 400);
+            let image = raytrace::render(&world, 400, 400);
 
             let bmpimage = BMPImage::from(image);
 
