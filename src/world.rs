@@ -77,8 +77,8 @@ impl Entity for Sphere {
                 return IntersectionResult::No;
             }
         } else {
-            let t1 = (-b + delta.sqrt()) / (2. * a);
-            let t2 = (-b - delta.sqrt()) / (2. * a);
+            let t1 = (-b - delta.sqrt()) / (2. * a);
+            let t2 = (-b + delta.sqrt()) / (2. * a);
             // We're inside the sphere
             if t1 > 0. {
                 return IntersectionResult::Two(t1, t2);
