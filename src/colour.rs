@@ -100,10 +100,6 @@ impl Colour {
         Self::new(1., 1., 1.)
     }
 
-    pub fn black() -> Self {
-        Self::new(0., 0., 0.)
-    }
-
     pub fn as_rgb24(&self) -> u32 {
         let r = f32_0_1_to_u8_0_255(self.r) as u32;
         let g = f32_0_1_to_u8_0_255(self.g) as u32;

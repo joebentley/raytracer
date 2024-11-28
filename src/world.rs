@@ -26,6 +26,7 @@ pub enum IntersectionResult {
 pub trait Entity {
     fn intersection(&self, ray: Vector) -> IntersectionResult;
     fn material(&self) -> Material;
+    #[allow(dead_code)] // used by test
     fn position(&self) -> Vector;
     fn normal(&self, position: Vector) -> Vector;
 }
@@ -35,16 +36,6 @@ pub struct Sphere {
     position: Vector,
     radius: f64,
     material: Material,
-}
-
-impl Sphere {
-    pub fn new(position: Vector, radius: f64, colour: Colour) -> Self {
-        Self {
-            position,
-            radius,
-            material: Material { colour },
-        }
-    }
 }
 
 impl Entity for Sphere {

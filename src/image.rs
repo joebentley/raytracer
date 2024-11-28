@@ -13,17 +13,6 @@ impl Image {
         }
     }
 
-    pub fn fill_with(&mut self, r: u8, g: u8, b: u8) -> &mut Self {
-        for y in 0..self.height as usize {
-            for x in 0..self.width as usize {
-                self.pixel_data[3 * x + 3 * self.width as usize * y] = b;
-                self.pixel_data[1 + 3 * x + 3 * self.width as usize * y] = g;
-                self.pixel_data[2 + 3 * x + 3 * self.width as usize * y] = r;
-            }
-        }
-        return self;
-    }
-
     pub fn put_pixel(&mut self, x: u16, y: u16, value_rgb24: u32) -> &mut Self {
         let x = x as usize;
         let y = y as usize;
