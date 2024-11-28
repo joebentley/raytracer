@@ -104,7 +104,7 @@ pub struct RaycastResult {
     pub material: Material,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub struct Light {
     pub position: Vector,
     pub intensity: f64,
@@ -138,6 +138,16 @@ impl World {
     pub fn from_toml(table: &toml::Table) -> Self {
         let mut world = Self::new();
 
+        if let Some(value) = table.get("light") {
+            if let Ok(light) = toml::Value::try_into::<Light>(value.clone()) {
+                world.light = light;
+            } else {
+                eprintln!("Warning: failed to parse light");
+            }
+        } else {
+            eprintln!("Warning: no light specified, using default");
+        }
+
         if let Some(toml::Value::Array(array)) = table.get("entities") {
             for entity in array {
                 if let Some(toml::Value::String(s)) = entity.get("type") {
@@ -147,10 +157,16 @@ impl World {
                                 world.entities.push(Box::new(sphere));
                             }
                         }
-                        _ => {}
+                        _ => {
+                            eprintln!("Warning: missing entity type");
+                        }
                     }
+                } else {
+                    eprintln!("Warning: failed to parse an entity");
                 }
             }
+        } else {
+            eprintln!("Warning: no entities specified");
         }
 
         return world;
@@ -206,6 +222,10 @@ mod tests {
     #[test]
     fn test_toml_deserialize() {
         let toml_string = r#"
+        [light]
+        position = {x = 1, y = 0, z = 0}
+        intensity = 0.8
+
         [[entities]]
         type = "sphere"
         position = {x = 0, y = 0, z = 0}
@@ -234,7 +254,7 @@ mod tests {
         let table = toml_string.parse::<toml::Table>().unwrap();
         let world = World::from_toml(&table);
 
+        assert_eq!(world.light.intensity, 0.8);
         assert_eq!(world.entities.len(), 2);
-        assert!(false);
     }
 }

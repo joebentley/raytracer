@@ -5,53 +5,63 @@ mod vector;
 mod world;
 
 use std::env;
+use std::error::Error;
+use std::io::Read;
 use std::{fs::File, io::Write};
 
 use colour::Colour;
 use image::BMPImage;
-use vector::Vector;
-use world::{Light, Sphere, World};
+use world::World;
 
-const USAGE: &str = "USAGE: ./raytrace [output_file]";
+const USAGE: &str = "USAGE: ./raytrace [world_spec] [output_file]";
 
 fn main() {
     let args = env::args();
 
-    let mut filename = None;
+    let mut world_spec_filename = None;
+    let mut output_filename = None;
     let mut num_args = 0;
     for (i, arg) in args.enumerate() {
         num_args += 1;
-        if i == 1 {
-            filename = Some(arg);
+
+        // positional args
+        match i {
+            1 => {
+                world_spec_filename = Some(arg);
+            }
+            2 => {
+                output_filename = Some(arg);
+            }
+            _ => {}
         }
     }
 
-    if num_args == 1 {
+    if num_args < 3 {
         println!("{}", USAGE);
         return;
     }
 
-    let mut world = World::new();
-    world.light = Light::new(Vector::new(-1., -4., -1.), 1.1);
-    let sphere = Box::new(Sphere::new(
-        Vector::new(0., 0., 4.),
-        2.,
-        Colour::new(1., 0., 0.),
-    ));
-    let sphere2 = Box::new(Sphere::new(
-        Vector::new(1., 0.5, 3.),
-        1.5,
-        Colour::new(1., 0., 1.),
-    ));
-    world.entities.push(sphere);
-    world.entities.push(sphere2);
+    match open_and_parse_toml(world_spec_filename.unwrap().as_str()) {
+        Ok(world) => {
+            let image = raytrace::render(&world, Colour::white(), 400, 400);
 
-    let image = raytrace::render(&world, Colour::white(), 400, 400);
+            let bmpimage = BMPImage::from(image);
 
-    let bmpimage = BMPImage::from(image);
+            File::create(output_filename.unwrap())
+                .unwrap()
+                .write(bmpimage.as_bytes().as_slice())
+                .unwrap();
+        }
+        Err(e) => {
+            eprintln!("Error: {:}", e);
+        }
+    }
+}
 
-    File::create(filename.unwrap())
-        .unwrap()
-        .write(bmpimage.as_bytes().as_slice())
-        .unwrap();
+fn open_and_parse_toml(filename: &str) -> Result<World, Box<dyn Error>> {
+    let mut file = File::open(filename)?;
+    let mut buf = String::new();
+    file.read_to_string(&mut buf)?;
+    let table = buf.parse::<toml::Table>()?;
+    return Ok(World::from_toml(&table));
 }
