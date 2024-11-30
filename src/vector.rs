@@ -127,6 +127,14 @@ impl Vector {
     pub fn dot(&self, other: &Self) -> f64 {
         return self.x * other.x + self.y * other.y + self.z * other.z;
     }
+
+    pub fn cross(&self, other: &Self) -> Self {
+        Self {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
+    }
 }
 
 impl Add for Vector {
@@ -255,5 +263,14 @@ mod tests {
         let a = Vector::new(1., 2., 3.);
         let b = Vector::new(2., 3., 4.);
         assert_eq!(a.dot(&b), 20.);
+    }
+
+    #[test]
+    fn vector_cross() {
+        let a = Vector::new(1., 2., 3.);
+        let b = Vector::new(2., 3., 4.);
+        let c = a.cross(&b);
+        assert_eq!(c.dot(&a), 0.0);
+        assert_eq!(c.dot(&b), 0.0);
     }
 }
